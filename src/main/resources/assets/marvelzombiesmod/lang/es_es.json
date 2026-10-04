@@ -1,0 +1,17 @@
+{
+  "itemGroup.marvelzombiesmod": "Marvel Zombies",
+  "item.marvelzombiesmod.energy_sword": "Espada de Energía",
+  "item.marvelzombiesmod.power_guide": "Guía de Poderes",
+  "item.marvelzombiesmod.shadow_army_totem": "Tótem del Ejército de Sombras",
+  "item.marvelzombiesmod.neon_ingot": "Lingote de Neón",
+  "item.marvelzombiesmod.shadow_core": "Núcleo de Sombra",
+  "item.marvelzombiesmod.void_circuit": "Circuito del Vacío",
+  "item.marvelzombiesmod.plasma_rifle": "Rifle de Plasma",
+  "item.marvelzombiesmod.void_blade": "Hoja del Vacío",
+  "item.marvelzombiesmod.ray_cannon": "Cañón de Rayos",
+  "block.marvelzombiesmod.neon_ore": "Mineral de Neón",
+  "block.marvelzombiesmod.starlight_block": "Bloque de Luz Estelar",
+  "message.marvelzombiesmod.start": "Bienvenido al mundo de Marvel Zombies. Tu viaje comienza con la Espada de Energía y la Guía de Poderes.",
+  "message.marvelzombiesmod.level_unlock": "Nivel %s desbloqueado: el Ejército de Sombras despierta.",
+  "message.marvelzombiesmod.guide": "Derrota monstruos y jefes para subir de nivel. Llega al nivel 3 para despertar a tu ejército de sombras. Crea armas futuristas con mineral de neón y núcleo de sombra."
+}

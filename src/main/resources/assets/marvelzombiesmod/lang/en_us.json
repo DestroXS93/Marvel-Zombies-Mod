@@ -1,0 +1,17 @@
+{
+  "itemGroup.marvelzombiesmod": "Marvel Zombies",
+  "item.marvelzombiesmod.energy_sword": "Energy Sword",
+  "item.marvelzombiesmod.power_guide": "Power Guide",
+  "item.marvelzombiesmod.shadow_army_totem": "Shadow Army Totem",
+  "item.marvelzombiesmod.neon_ingot": "Neon Ingot",
+  "item.marvelzombiesmod.shadow_core": "Shadow Core",
+  "item.marvelzombiesmod.void_circuit": "Void Circuit",
+  "item.marvelzombiesmod.plasma_rifle": "Plasma Rifle",
+  "item.marvelzombiesmod.void_blade": "Void Blade",
+  "item.marvelzombiesmod.ray_cannon": "Ray Cannon",
+  "block.marvelzombiesmod.neon_ore": "Neon Ore",
+  "block.marvelzombiesmod.starlight_block": "Starlight Block",
+  "message.marvelzombiesmod.start": "Welcome to the Marvel Zombies world. Your journey begins with the Energy Sword and the Power Guide.",
+  "message.marvelzombiesmod.level_unlock": "Level %s unlocked: the Shadow Army awakens.",
+  "message.marvelzombiesmod.guide": "Defeat monsters and bosses to level up. Reach level 3 to awaken your shadow army. Craft futuristic weapons with Neon Ore and Shadow Core."
+}

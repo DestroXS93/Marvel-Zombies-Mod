@@ -1,0 +1,13 @@
+modLoader="forge"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+issueTrackerURL="https://github.com/DestroXS93/Marvel-Zombies-Mod/issues"
+[[mods]]
+modId="marvelzombiesmod"
+version="1.0.0"
+displayName="Marvel Zombies Mod"
+displayURL="https://github.com/DestroXS93/Marvel-Zombies-Mod"
+authors="DestroXS93"
+description='''
+Mod de Minecraft 1.20.1 inspirado en Marvel Zombies, con nivelación, armas futuristas, exotrajes, ejército de sombras y guia de poderes.
+'''
