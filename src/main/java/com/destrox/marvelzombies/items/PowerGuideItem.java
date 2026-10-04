@@ -1,95 +1,17 @@
-package com.destrox.marvelzombies.util;
+package com.destrox.marvelzombies.items;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
-public final class PlayerProgress {
-    private static final String TAG = "marvel_zombies_progress";
-
-    public static void addXp(ServerPlayer player, int amount) {
-        CompoundTag data = player.getPersistentData();
-        CompoundTag progressData = data.getCompound(TAG);
-
-        int level = progressData.getInt("level");
-        int xp = progressData.getInt("xp");
-        int next = progressData.getInt("next");
-
-        if (level <= 0) {
-            level = 1;
-        }
-        if (next <= 0) {
-            next = 50;
-        }
-
-        xp += amount;
-        while (xp >= next && level < 100) {
-            xp -= next;
-            level += 1;
-            next = getNextLevelRequirement(level);
-            player.displayClientMessage(Component.literal("§6Nivel " + level + " alcanzado. Recompensa desbloqueada."), false);
-            player.displayClientMessage(Component.literal("§7" + getRewardDescription(level)), false);
-        }
-
-        if (level >= 100 && xp > 0) {
-            xp = next - 1;
-        }
-
-        progressData.putInt("level", level);
-        progressData.putInt("xp", xp);
-        progressData.putInt("next", next);
-        data.put(TAG, progressData);
-
-        if (level >= 3 && !data.getBoolean("shadow_ability_unlocked")) {
-            data.putBoolean("shadow_ability_unlocked", true);
-            player.displayClientMessage(Component.literal("§eTu Ejército de Sombras ha despertado. Ya puedes invocarlo."), false);
-        }
-    }
-
-    public static int getLevel(ServerPlayer player) {
-        CompoundTag data = player.getPersistentData();
-        CompoundTag progressData = data.getCompound(TAG);
-        return Math.max(1, progressData.getInt("level"));
-    }
-
-    public static int getXp(ServerPlayer player) {
-        CompoundTag data = player.getPersistentData();
-        CompoundTag progressData = data.getCompound(TAG);
-        return progressData.getInt("xp");
-    }
-
-    public static int getNextLevelRequirement(int level) {
-        return 50 + Math.max(0, level - 1) * 25;
-    }
-
-    public static String getRewardDescription(int level) {
-        return switch (level) {
-            case 1 -> "⚡ Espada de Energía: arma inicial del protagonista y punto de partida del viaje.";
-            case 2 -> "🔩 Kit tecnológico: materiales básicos para crear armas futuristas y mejoras.";
-            case 3 -> "👥 Ejército de Sombras: desbloqueas tu legión permanente de sombras.";
-            case 5 -> "🛡️ Exotraje básico: protección temprana y primeras mejoras de combate.";
-            case 10 -> "🚀 Rifle de plasma: arma futurista de largo alcance con mayor potencia.";
-            case 15 -> "🤖 Exotraje avanzado: mejora de defensa y habilidad especial mejorada.";
-            case 20 -> "⚡ Hoja del Vacío: obtienes tu arma de energía avanzada y habilidad especial.";
-            case 30 -> "🔥 Exotraje legendario: rebelde, poderoso y mucho más resistente.";
-            case 35 -> "💀 Tropas de sombras reforzadas: tus sombras se vuelven más fuertes y más numerosas.";
-            case 40 -> "💣 Arma de energía avanzada: nueva potencia elemental y mejor daño.";
-            case 50 -> "👑 Exotraje intermedio / definitivo: preparas tu máxima fase de combate y defensa.";
-            case 75 -> "🔫 Cañón de rayos: arma definitiva de ataque a gran escala.";
-            case 100 -> "🏆 Poder máximo: has llegado al nivel final del mundo y dominas el poder de Marvel Zombies.";
-            default -> "✨ Recompensa: mejora general de estadísticas y poder del jugador.";
-        };
-    }
-
-    public static boolean isShadowUnlocked(ServerPlayer player) {
-        return player.getPersistentData().getBoolean("shadow_ability_unlocked")
-                || getLevel(player) >= 3;
-    }
-
-    public static void grantStarterPack(ServerPlayer player) {
-        CompoundTag data = player.getPersistentData();
-        if (!data.getBoolean("starter_pack_given")) {
-            data.putBoolean("starter_pack_given", true);
-        }
-    }
-}
+/**
+ * PowerGuideItem - Guía de Poderes de Marvel Zombies
+ * Libro interactivo con toda la información del mod en español.
+ */
+public class PowerGuideItem extends Item {
+    public PowerGuideItem(Properties properties) {
+        super(properties);\n    }\n\n    @Override\n    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {\n        ItemStack stack = player.getItemInHand(hand);\n\n        if (!level.isClientSide) {\n            // Título y bienvenida\n            player.sendSystemMessage(Component.literal(\"§6========== GUÍA DE PODERES ==========\"));\n            player.sendSystemMessage(Component.literal(\"§6MARVEL ZOMBIES MOD v1.0\"));\n            player.sendSystemMessage(Component.literal(\"§7Bienvenido al mundo de Marvel Zombies.\"));\n            player.sendSystemMessage(Component.literal(\"§7Tu viaje comienza con la Espada de Energía y la guía del poder.\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Sistema de nivelación\n            player.sendSystemMessage(Component.literal(\"§6=== SISTEMA DE NIVELACIÓN ===\"));\n            player.sendSystemMessage(Component.literal(\"§7Derrota monstruos y jefes para ganar experiencia.\"));\n            player.sendSystemMessage(Component.literal(\"§7Cada nivel desbloquea armas, mejoras, exotrajes y habilidades.\"));\n            player.sendSystemMessage(Component.literal(\"§7La progresión va del nivel 1 al 100.\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 1-3\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 1-3: ARMA INICIAL + GUÍA ===\"));\n            player.sendSystemMessage(Component.literal(\"§7Nivel 1: ⚡ Espada de Energía\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Daño: 7 | Velocidad de ataque: 1.6\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Efecto: encendimiento pasivo (2s)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Tu primer arma futurista.\"));\n            player.sendSystemMessage(Component.literal(\"§7Nivel 2: 🔩 Kit tecnológico\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Material base para fabricar mejoras y equipamiento.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Recoge esto del mundo para craftear.\"));\n            player.sendSystemMessage(Component.literal(\"§7Nivel 3: 👥 Ejército de Sombras\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Desbloqueas tu legión permanente.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Invoca con el Tótem de Sombras.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Inicial: 3 sombras, 24 HP, 6 daño.\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 5\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 5: EXOTRAJE BÁSICO ===\"));\n            player.sendSystemMessage(Component.literal(\"§7🛡️ Primera armadura futurista.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Defensa: +2 | Toughness: 1.0 | Knockback: 5%\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Habilidad: salto potenciado (+0.5 altura)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Craft: 4x Mineral Neón + 2x Núcleo Sombra\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 10\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 10: RIFLE DE PLASMA ===\"));\n            player.sendSystemMessage(Component.literal(\"§7🚀 Arma futurista de largo alcance.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Daño: 9 | Velocidad: 0.9\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Efecto: encendimiento (2s)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Perfecta para combates a distancia.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Craft: 3x Neón + 2x Shadow Core + 1x Void Circuit\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 15\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 15: EXOTRAJE AVANZADO ===\"));\n            player.sendSystemMessage(Component.literal(\"§7🤖 Armadura mejorada con habilidades.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Defensa: +3 | Toughness: 2.0 | Knockback: 8%\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Habilidad: resistencia al daño +15%\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Craft: 6x Neón + 3x Shadow Core + 2x Void Circuit\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 20\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 20: HOJA DEL VACÍO ===\"));\n            player.sendSystemMessage(Component.literal(\"§7⚡ Arma de energía con poder absoluto.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Daño: 12 | Velocidad: 0.8\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Efecto: debilitamiento de enemigos (1s)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Ideal para mezclar fuerza física y poder energético.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Craft: 4x Shadow Core + 2x Void Circuit + 1x Espada Energía\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 30\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 30: EXOTRAJE LEGENDARIO ===\"));\n            player.sendSystemMessage(Component.literal(\"§7🔥 Armadura legendaria de poder supremo.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Defensa: +4 | Toughness: 3.0 | Knockback: 10%\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Habilidad: regeneración pasiva (1 corazón cada 5s)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Cuerpo del jugador se vuelve mucho más fuerte.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Craft: 7x Neón + 4x Shadow Core + 3x Void Circuit\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 35\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 35: TROPAS DE SOMBRAS REFORZADAS ===\"));\n            player.sendSystemMessage(Component.literal(\"§7💀 Tu ejército se vuelve prácticamente invencible.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Máximo de sombras: 8 unidades (era 3)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Salud de sombras: 30 HP (era 24)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Daño de sombras: 8 (era 6)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Las sombras ya no son solo apoyo; son arma de guerra.\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 40\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 40: ARMA DE ENERGÍA AVANZADA ===\"));\n            player.sendSystemMessage(Component.literal(\"§7💣 Nueva potencia elemental devastadora.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Daño: 14 | Velocidad: 0.75\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Efecto: quema + debilitamiento (2s)\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Capaz de derribar enemigos pesados con rapidez.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Craft: 5x Neón + 3x Void Circuit + 2x Void Essence\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 50\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 50: EXOTRAJE INTERMEDIO / DEFINITIVO ===\"));\n            player.sendSystemMessage(Component.literal(\"§7👑 La armadura definitiva del protagonista.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Defensa: +5 | Toughness: 4.0 | Knockback: 15%\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Habilidad: velocidad +20%, velocidad ataque +25%\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Mucha más defensa, velocidad y poder de ataque.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Craft: 8x Neón + 5x Shadow Core + 4x Void Circuit + 2x Void Essence\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 75\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 75: CAÑÓN DE RAYOS ===\"));\n            player.sendSystemMessage(Component.literal(\"§7🔫 Arma final de devastación a gran escala.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Daño: 16 | Velocidad: 0.7\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Efecto: quema + rayo (3s), knockback aumentado\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Se equipa como arma final de apoyo ofensivo.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Craft: 5x Neón + 3x Void Circuit + 2x Void Essence\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Nivel 100\n            player.sendSystemMessage(Component.literal(\"§6=== NIVEL 100: PODER MÁXIMO / FINAL ===\"));\n            player.sendSystemMessage(Component.literal(\"§7🏆 El nivel final del mundo de Marvel Zombies.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Todos los items y habilidades desbloqueados.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - Sombras: 15 unidades, 50 HP, 10 daño.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - El jugador es casi invencible.\"));\n            player.sendSystemMessage(Component.literal(\"§7  - El mundo queda bajo tu dominio completo.\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Materiales del mundo\n            player.sendSystemMessage(Component.literal(\"§6=== MATERIALES DEL MUNDO ===\"));\n            player.sendSystemMessage(Component.literal(\"§7Mineral de Neón: base para armas futuristas y exotrajes.\"));\n            player.sendSystemMessage(Component.literal(\"§7Núcleo de Sombra: material oscuro para poder y defensa.\"));\n            player.sendSystemMessage(Component.literal(\"§7Circuito del Vacío: tecnología avanzada para armas poderosas.\"));\n            player.sendSystemMessage(Component.literal(\"§7Kit Tecnológico: recursos iniciales y mejora básica.\"));\n            player.sendSystemMessage(Component.literal(\"§7Esencia del Vacío: recurso raro para armas legendarias.\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Instrucciones de uso\n            player.sendSystemMessage(Component.literal(\"§6=== INSTRUCCIONES DE USO ===\"));\n            player.sendSystemMessage(Component.literal(\"§7✓ Usa la Espada de Energía al comenzar tu viaje.\"));\n            player.sendSystemMessage(Component.literal(\"§7✓ Recolecta materiales del mundo para fabricar armas.\"));\n            player.sendSystemMessage(Component.literal(\"§7✓ Craftea armas y exotrajes en mesa de trabajo.\"));\n            player.sendSystemMessage(Component.literal(\"§7✓ El Tótem de Sombras invoca a tus sombras; úsalo otra vez para desecharlos.\"));\n            player.sendSystemMessage(Component.literal(\"§7✓ No te saltes la progresión: cada nivel prepara el siguiente desafío.\"));\n            player.sendSystemMessage(Component.literal(\"§7✓ Derrota monstruos y jefes constantemente para ganar experiencia.\"));\n            player.sendSystemMessage(Component.literal(\"§7✓ Sube de nivel para desbloquear nuevas armas y mejoras cada 5 niveles.\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Objetivo final\n            player.sendSystemMessage(Component.literal(\"§6=== OBJETIVO FINAL ===\"));\n            player.sendSystemMessage(Component.literal(\"§7Llega al nivel 100.\"));\n            player.sendSystemMessage(Component.literal(\"§7Domina el Ejército de Sombras.\"));\n            player.sendSystemMessage(Component.literal(\"§7Crea todas las armas futuristas.\"));\n            player.sendSystemMessage(Component.literal(\"§7Desbloquea los cuatro exotrajes.\"));\n            player.sendSystemMessage(Component.literal(\"§7Supera todos los desafíos del mundo.\"));\n            player.sendSystemMessage(Component.literal(\"§7Convierte en el héroe supremo de Marvel Zombies.\"));\n            player.sendSystemMessage(Component.literal(\"§7\"));\n\n            // Pie de página\n            player.sendSystemMessage(Component.literal(\"§6========== FIN DE LA GUÍA ==========\"));\n            player.sendSystemMessage(Component.literal(\"§7¡Que comience tu épico viaje!\"));\n        }\n\n        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);\n    }\n}\n
