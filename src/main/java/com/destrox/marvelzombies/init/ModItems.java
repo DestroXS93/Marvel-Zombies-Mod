@@ -1,46 +1,39 @@
-package com.destrox.marvelzombies.init;
+package com.destrox.marvelzombies.items;
 
-import com.destrox.marvelzombies.items.EnergySwordItem;
-import com.destrox.marvelzombies.items.FuturisticWeaponItem;
-import com.destrox.marvelzombies.items.PowerGuideItem;
-import com.destrox.marvelzombies.items.ShadowArmyTotemItem;
-import net.minecraft.world.item.BlockItem;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
-public final class ModItems {
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, "marvelzombiesmod");
+public class PowerGuideItem extends Item {
+    public PowerGuideItem(Properties properties) {
+        super(properties);
+    }
 
-    public static final RegistryObject<Item> POWER_GUIDE = ITEMS.register("power_guide",
-            () -> new PowerGuideItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 
-    public static final RegistryObject<Item> ENERGY_SWORD = ITEMS.register("energy_sword",
-            () -> new EnergySwordItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+        if (!level.isClientSide) {
+            player.sendSystemMessage(Component.literal("§6Guía de Poderes"));
+            player.sendSystemMessage(Component.literal("§7=== NIVEL 1–3 ==="));
+            player.sendSystemMessage(Component.literal("§7Nivel 1: Espada de Energía. Nivel 2: Kit tecnológico. Nivel 3: Ejército de Sombras."));
+            player.sendSystemMessage(Component.literal("§7=== ARMAS Y RECOMPENSAS ==="));
+            player.sendSystemMessage(Component.literal("§7Nivel 3: Ejército de Sombras permanente."));
+            player.sendSystemMessage(Component.literal("§7Nivel 10: Rifle de plasma."));
+            player.sendSystemMessage(Component.literal("§7Nivel 20: Hoja del Vacío."));
+            player.sendSystemMessage(Component.literal("§7Nivel 35: Tropas de sombras reforzadas."));
+            player.sendSystemMessage(Component.literal("§7Nivel 50: Exotraje intermedio / definitivo."));
+            player.sendSystemMessage(Component.literal("§7Nivel 75: Cañón de rayos."));
+            player.sendSystemMessage(Component.literal("§7Nivel 100: Poder máximo / final."));
+            player.sendSystemMessage(Component.literal("§7También se mantienen las recompensas extra previas: exotrajes básicos, avanzados, legendarios y arma de energía avanzada."));
+            player.sendSystemMessage(Component.literal("§7Derrota monstruos y jefes para subir de nivel, conseguir materiales del mundo y reforzar tu ejército."));
+            player.sendSystemMessage(Component.literal("§7El Tótem de Sombras invoca o desecha a tus guerreros si los necesitas."));
+        }
 
-    public static final RegistryObject<Item> SHADOW_ARMY_TOTEM = ITEMS.register("shadow_army_totem",
-            () -> new ShadowArmyTotemItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
-
-    public static final RegistryObject<Item> NEON_INGOT = ITEMS.register("neon_ingot",
-            () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
-
-    public static final RegistryObject<Item> SHADOW_CORE = ITEMS.register("shadow_core",
-            () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-
-    public static final RegistryObject<Item> VOID_CIRCUIT = ITEMS.register("void_circuit",
-            () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-
-    public static final RegistryObject<Item> PLASMA_RIFLE = ITEMS.register("plasma_rifle",
-            () -> new FuturisticWeaponItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 9, 0.9F));
-
-    public static final RegistryObject<Item> VOID_BLADE = ITEMS.register("void_blade",
-            () -> new FuturisticWeaponItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 11, 0.8F));
-
-    public static final RegistryObject<Item> RAY_CANNON = ITEMS.register("ray_cannon",
-            () -> new FuturisticWeaponItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 12, 0.7F));
-
-    private ModItems() {
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 }

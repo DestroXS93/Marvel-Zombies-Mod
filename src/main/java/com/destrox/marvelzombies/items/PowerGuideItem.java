@@ -1,63 +1,95 @@
-package com.destrox.marvelzombies.items;
+package com.destrox.marvelzombies.util;
 
-import com.destrox.marvelzombies.entity.ShadowMinionEntity;
-import com.destrox.marvelzombies.init.ModEntities;
-import com.destrox.marvelzombies.util.PlayerProgress;
-import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
-public class ShadowArmyTotemItem extends Item {
-    public ShadowArmyTotemItem(Properties properties) {
-        super(properties);
+public final class PlayerProgress {
+    private static final String TAG = "marvel_zombies_progress";
+
+    public static void addXp(ServerPlayer player, int amount) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag progressData = data.getCompound(TAG);
+
+        int level = progressData.getInt("level");
+        int xp = progressData.getInt("xp");
+        int next = progressData.getInt("next");
+
+        if (level <= 0) {
+            level = 1;
+        }
+        if (next <= 0) {
+            next = 50;
+        }
+
+        xp += amount;
+        while (xp >= next && level < 100) {
+            xp -= next;
+            level += 1;
+            next = getNextLevelRequirement(level);
+            player.displayClientMessage(Component.literal("§6Nivel " + level + " alcanzado. Recompensa desbloqueada."), false);
+            player.displayClientMessage(Component.literal("§7" + getRewardDescription(level)), false);
+        }
+
+        if (level >= 100 && xp > 0) {
+            xp = next - 1;
+        }
+
+        progressData.putInt("level", level);
+        progressData.putInt("xp", xp);
+        progressData.putInt("next", next);
+        data.put(TAG, progressData);
+
+        if (level >= 3 && !data.getBoolean("shadow_ability_unlocked")) {
+            data.putBoolean("shadow_ability_unlocked", true);
+            player.displayClientMessage(Component.literal("§eTu Ejército de Sombras ha despertado. Ya puedes invocarlo."), false);
+        }
     }
 
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        if (!(player instanceof ServerPlayer serverPlayer)) {
-            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+    public static int getLevel(ServerPlayer player) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag progressData = data.getCompound(TAG);
+        return Math.max(1, progressData.getInt("level"));
+    }
+
+    public static int getXp(ServerPlayer player) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag progressData = data.getCompound(TAG);
+        return progressData.getInt("xp");
+    }
+
+    public static int getNextLevelRequirement(int level) {
+        return 50 + Math.max(0, level - 1) * 25;
+    }
+
+    public static String getRewardDescription(int level) {
+        return switch (level) {
+            case 1 -> "⚡ Espada de Energía: arma inicial del protagonista y punto de partida del viaje.";
+            case 2 -> "🔩 Kit tecnológico: materiales básicos para crear armas futuristas y mejoras.";
+            case 3 -> "👥 Ejército de Sombras: desbloqueas tu legión permanente de sombras.";
+            case 5 -> "🛡️ Exotraje básico: protección temprana y primeras mejoras de combate.";
+            case 10 -> "🚀 Rifle de plasma: arma futurista de largo alcance con mayor potencia.";
+            case 15 -> "🤖 Exotraje avanzado: mejora de defensa y habilidad especial mejorada.";
+            case 20 -> "⚡ Hoja del Vacío: obtienes tu arma de energía avanzada y habilidad especial.";
+            case 30 -> "🔥 Exotraje legendario: rebelde, poderoso y mucho más resistente.";
+            case 35 -> "💀 Tropas de sombras reforzadas: tus sombras se vuelven más fuertes y más numerosas.";
+            case 40 -> "💣 Arma de energía avanzada: nueva potencia elemental y mejor daño.";
+            case 50 -> "👑 Exotraje intermedio / definitivo: preparas tu máxima fase de combate y defensa.";
+            case 75 -> "🔫 Cañón de rayos: arma definitiva de ataque a gran escala.";
+            case 100 -> "🏆 Poder máximo: has llegado al nivel final del mundo y dominas el poder de Marvel Zombies.";
+            default -> "✨ Recompensa: mejora general de estadísticas y poder del jugador.";
+        };
+    }
+
+    public static boolean isShadowUnlocked(ServerPlayer player) {
+        return player.getPersistentData().getBoolean("shadow_ability_unlocked")
+                || getLevel(player) >= 3;
+    }
+
+    public static void grantStarterPack(ServerPlayer player) {
+        CompoundTag data = player.getPersistentData();
+        if (!data.getBoolean("starter_pack_given")) {
+            data.putBoolean("starter_pack_given", true);
         }
-
-        if (PlayerProgress.getLevel(serverPlayer) < 3) {
-            player.displayClientMessage(Component.literal("§cNecesitas llegar al nivel 3 para despertar al Ejército de Sombras."), true);
-            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
-        }
-
-        if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
-            var existing = serverLevel.getEntitiesOfClass(ShadowMinionEntity.class, player.getBoundingBox().inflate(24.0D), entity -> entity.getOwner() == player);
-            if (!existing.isEmpty()) {
-                for (ShadowMinionEntity entity : existing) {
-                    entity.discard();
-                }
-                player.displayClientMessage(Component.literal("§7Has descartado a tus sombras."), false);
-                return InteractionResultHolder.sidedSuccess(stack, true);
-            }
-
-            BlockPos pos = player.blockPosition();
-            for (int i = 0; i < 3; i++) {
-                BlockPos spawnPos = pos.offset(player.getRandom().nextInt(5) - 2, 0, player.getRandom().nextInt(5) - 2);
-                ShadowMinionEntity minion = ModEntities.SHADOW_MINION.get().create(serverLevel);
-                if (minion != null) {
-                    minion.moveTo(spawnPos.getX() + 0.5D, spawnPos.getY(), spawnPos.getZ() + 0.5D, 0.0F, 0.0F);
-                    minion.setOwner(player);
-                    minion.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(spawnPos), MobSpawnType.MOB_SUMMONED, null, null);
-                    serverLevel.addFreshEntity(minion);
-                }
-            }
-
-            player.displayClientMessage(Component.literal("§eEl Ejército de Sombras ha sido convocado."), false);
-            player.getCooldowns().addCooldown(this, 200);
-        }
-
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 }
