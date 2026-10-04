@@ -1,25 +1,39 @@
 # Marvel Zombies Mod
 
-Mod de Minecraft 1.20.1 Forge inspirado en Marvel Zombies con:
-- sistema de nivelación del 1 al 100 por derrotar monstruos y jefes
-- recompensas por nivel
-- armas futuristas
-- materiales del mundo para fabricar armas y exotrajes
-- ejército de sombras permanente con opción de descartarlo
-- espada de energía y guía de poderes al iniciar la partida
+Mod de Minecraft 1.20.1 Forge inspirado en Marvel Zombies con armas futuristas, progresión por niveles, exotrajes, materiales del mundo y un Ejército de Sombras permanente.
 
-## Objetivo del mod
-Este proyecto crea una base jugable y extensible para un mundo donde el jugador avanza desde un nivel básico hasta convertirse en un combatiente con un ejército de sombras, exotrajes de alto poder y armas de energía.
+## Progresión recomendada
 
-## Sistema principal
-- Matar monstruos o jefes otorga experiencia.
-- Al llegar al nivel 3, el jugador desbloquea el Ejército de Sombras.
-- El libro de poderes explica el funcionamiento del mod.
-- Los materiales de neón y núcleo de sombra se usan para armas y progreso.
+- Nivel 1–3: arma inicial + guía de inicio
+- Nivel 1: Espada de Energía
+- Nivel 2: Kit tecnológico
+- Nivel 3: Ejército de Sombras
+- Nivel 5: Exotraje básico
+- Nivel 10: Rifle de plasma
+- Nivel 15: Exotraje avanzado
+- Nivel 20: Hoja del Vacío
+- Nivel 30: Exotraje legendario
+- Nivel 35: Tropas de sombras reforzadas
+- Nivel 40: Arma de energía avanzada
+- Nivel 50: Exotraje intermedio / definitivo
+- Nivel 75: Cañón de rayos
+- Nivel 100: Poder máximo / final
 
-## Versión compatible
-- Minecraft: 1.20.1
-- Forge: 47.2.0
+## Sistema de juego
 
-## Repositorio
-https://github.com/DestroXS93/Marvel-Zombies-Mod
+- Derrota monstruos y jefes para ganar experiencia.
+- Cada nivel desbloquea nuevas habilidades, armas o mejoras.
+- El Ejército de Sombras se activa al llegar al nivel 3.
+- El Tótem de Sombras invoca o desecha a tus sombras.
+- Los materiales del mundo son: mineral de neón, núcleo de sombra, circuito del vacío y kit tecnológico.
+- Los exotrajes mejoran la defensa, resistencia y potencia del jugador con el avance del nivel.
+
+## Objetivo general
+
+Llegar al nivel 100, dominar el Ejército de Sombras, crear armas futuristas, desbloquear exotrajes y alcanzar el máximo poder del mundo.
+
+## Compatibilidad
+
+- Minecraft 1.20.1
+- Forge 47.2.0
+- GitHub: https://github.com/DestroXS93/Marvel-Zombies-Mod
