@@ -1,66 +1,90 @@
-package com.destrox.marvelzombies.event;
+package com.destrox.marvelzombies.util;
 
-import com.destrox.marvelzombies.init.ModItems;
-import com.destrox.marvelzombies.util.PlayerProgress;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = "marvelzombiesmod")
-public final class ModEvents {
-    private ModEvents() {
-    }
+public final class PlayerProgress {
+    private static final String TAG = "marvel_zombies_progress";
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) {
-            return;
+    public static void addXp(ServerPlayer player, int amount) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag progressData = data.getCompound(TAG);
+
+        int level = progressData.getInt("level");
+        int xp = progressData.getInt("xp");
+        int next = progressData.getInt("next");
+
+        if (level <= 0) {
+            level = 1;
+        }
+        if (next <= 0) {
+            next = 50;
         }
 
+        xp += amount;
+        while (xp >= next && level < 100) {
+            xp -= next;
+            level += 1;
+            next = getNextLevelRequirement(level);
+            player.displayClientMessage(Component.literal("§6Nivel " + level + " alcanzado. Recompensa desbloqueada."), false);
+            player.displayClientMessage(Component.literal("§7" + getRewardDescription(level)), false);
+        }
+
+        if (level >= 100 && xp > 0) {
+            xp = next - 1;
+        }
+
+        progressData.putInt("level", level);
+        progressData.putInt("xp", xp);
+        progressData.putInt("next", next);
+        data.put(TAG, progressData);
+
+        if (level >= 3 && !data.getBoolean("shadow_ability_unlocked")) {
+            data.putBoolean("shadow_ability_unlocked", true);
+            player.displayClientMessage(Component.literal("§eTu Ejército de Sombras ha despertado. Ya puedes invocarlo."), false);
+        }
+    }
+
+    public static int getLevel(ServerPlayer player) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag progressData = data.getCompound(TAG);
+        return Math.max(1, progressData.getInt("level"));
+    }
+
+    public static int getXp(ServerPlayer player) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag progressData = data.getCompound(TAG);
+        return progressData.getInt("xp");
+    }
+
+    public static int getNextLevelRequirement(int level) {
+        return 50 + Math.max(0, level - 1) * 25;
+    }
+
+    public static String getRewardDescription(int level) {
+        return switch (level) {
+            case 3 -> "Recompensa: desbloqueas el Ejército de Sombras permanente.";
+            case 5 -> "Recompensa: mejoras en tus armas y se activa la habilidad de exotraje básico.";
+            case 10 -> "Recompensa: desbloqueas el rifle de plasma y más daño en todas las armas.";
+            case 20 -> "Recompensa: obtienes la Hoja del Vacío y el arma de nivel medio.";
+            case 35 -> "Recompensa: se fortalece el Ejército de Sombras con más soldados y mejor combate.";
+            case 50 -> "Recompensa: obtienes el exotraje de nivel intermedio y la mejora del combate.";
+            case 75 -> "Recompensa: desbloqueas el Cañón de Rayos y el conjunto de exotrama elite.";
+            case 100 -> "Recompensa final: logras el máximo poder y dominas el mundo.";
+            default -> "Recompensa: mejora de estadísticas del jugador.";
+        };
+    }
+
+    public static boolean isShadowUnlocked(ServerPlayer player) {
+        return player.getPersistentData().getBoolean("shadow_ability_unlocked");
+                || getLevel(player) >= 3;
+    }
+
+    public static void grantStarterPack(ServerPlayer player) {
         CompoundTag data = player.getPersistentData();
         if (!data.getBoolean("starter_pack_given")) {
-            player.getInventory().add(new ItemStack(ModItems.POWER_GUIDE.get()));
-            player.getInventory().add(new ItemStack(ModItems.ENERGY_SWORD.get()));
-            player.getInventory().add(new ItemStack(ModItems.SHADOW_ARMY_TOTEM.get()));
             data.putBoolean("starter_pack_given", true);
-            player.displayClientMessage(Component.literal("§aBienvenido al mundo de Marvel Zombies. Tu viaje comienza ahora."), false);
-            player.displayClientMessage(Component.literal("§7Abre la Guía de Poderes para aprender a subir de nivel y crear armas."), false);
-        }
-
-        PlayerProgress.grantStarterPack(player);
-    }
-
-    @SubscribeEvent
-    public static void onLivingDeath(LivingDeathEvent event) {
-        if (event.getEntity().level().isClientSide) {
-            return;
-        }
-
-        if (!(event.getSource().getEntity() instanceof ServerPlayer player)) {
-            return;
-        }
-
-        Entity killed = event.getEntity();
-        if (killed instanceof Player) {
-            return;
-        }
-
-        int xp = (int) Math.max(8.0F, Math.ceil(killed.getMaxHealth() / 3.0F));
-        PlayerProgress.addXp(player, xp);
-
-        if (PlayerProgress.getLevel(player) >= 3) {
-            CompoundTag data = player.getPersistentData();
-            if (!data.getBoolean("shadow_ability_unlocked")) {
-                data.putBoolean("shadow_ability_unlocked", true);
-                player.displayClientMessage(Component.literal("§eTu ejército de sombras ha despertado."), false);
-            }
         }
     }
 }
